@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js" integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        var socket =io()
+        var username;
+        function setusername(){
+             if(document.getElementById('name').value==''){
+                 alert('Please enter username');
+             }else{
+                 socket.emit('setusername',document.getElementById('name').value)
+             }
+        }
+        socket.on('errorsend',function(data){
+            document.getElementById('error').innerHTML=data
+        })
+        socket.on('senduser',function(data){
+            username=data.username
+             document.getElementById('new-user-form').innerHTML='hello '+data.username+'<br><input type="text" id="massige"  placeholder="enter massige">\
+             <button onclick="msgsend()">send</button>\
+              <div id="massige-container"></div>' 
+             
+        })
+        function msgsend(){
+           var massige= document.getElementById('massige').value;
+            if(massige!==""){
+                document.getElementById('massige').value=''
+                socket.emit('msg',{massige:massige,name:username})
+            }
+        }
+          socket.on('newmsg',function(data){
+            if(username){
+               document.getElementById('massige-container').innerHTML +='\
+               <div> <br>\
+                <b>'+data.name+'</b> : ' +data.massige+' \
+                 </div>'
+              }
+          })
+
+    </script>
+</head>
+<body>
+   <div id="new-user-form">
+    <h1>chat application</h1>
+    <p id="error"></p>
+    <input type="text " id="name" placeholder="enter your name">
+    <button onclick="setusername()"> set your name</button>
+   </div>
+    
+</body>
+</html>
